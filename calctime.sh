@@ -8,10 +8,22 @@ function uptime_raw(){
   echo "$UPTIME"
 }
 
+# Formats time
+function format_time(){
+    HOURS=$(($1 / 60))
+    MINUTES=$(($1 % 60))
+    if [ $HOURS -eq 0 ]
+    then
+      echo "$MINUTES""m"
+    else
+      echo "$HOURS""h""$MINUTES""m"
+    fi
+}
+
 # Formats uptime to format '1h23m'
 function format_uptime(){
-  array=(`uptime_raw`)
-  echo "${array[0]}h${array[1]}m"
+  uptime=`uptime_in_mins`
+  echo "`format_time $uptime`"
 }
 
 # Converts current uptime to minutes
@@ -41,17 +53,20 @@ then
     UPTIME_IN_MINS=`uptime_in_mins`
 
     DIFF_MIN=$((UPTIME_IN_MINS - TIME_IN_MINS))
-    HOURS=$((DIFF_MIN / 60))
-    MINUTES=$((DIFF_MIN % 60))
-    if [ $HOURS -eq 0 ]
-    then
-      echo "$MINUTES""m"
-    else
-      echo "$HOURS""h""$MINUTES""m"
-    fi
-
+    format_time $DIFF_MIN
   else
-    echo "Error"
+    if [ $1 == "--help" ]
+    then
+      echo "Usage:"
+      echo "  calctime - prints foramted uptime"
+      echo "  calctime [formated_time] - prints differenc between uptime and passed time"
+      echo "    eg: calctime 1h23m"
+      echo
+      echo "Time Formating"
+      echo "yyhxxm - yy hours and xx minutes"
+    else
+      echo "Wrong arg '$1' see '--help' for instructions."
+    fi
   fi
 
 else
